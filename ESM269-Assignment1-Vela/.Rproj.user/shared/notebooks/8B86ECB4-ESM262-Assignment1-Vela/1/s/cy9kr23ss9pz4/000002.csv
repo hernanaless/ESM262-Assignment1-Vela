@@ -1,0 +1,5 @@
+"0","CA_Gazetteer_NewColumns <- Raw_CA_Gazetteer_Dataset"
+"0","names(CA_Gazetteer_NewColumns) <- c(""ID"", ""Name"", ""Class"", ""State"", ""State_ID"", ""County"", ""County_ID"", ""Latitude_DMS"", ""Longitude_DMS"", ""Latitude_DEC"", ""Longitude_DEC"", ""Latitude_DMS_SRC"", ""Longitude_DMS_SRC"", ""Latitude_DEC_SRC"", ""Longitude_DEC_SRC"", ""Elevation_MTS"", ""Elevation_FT"", ""MapName"", ""DateCreated"", ""DateEdited"")"
+"0","View(CA_Gazetteer_NewColumns)"
+"0","CA_Gazetter_SelectedColumns <- select(CA_Gazetteer_NewColumns, ID, Name, Class, State, County, Latitude_DEC, Longitude_DEC, Latitude_DEC_SRC, Longitude_DEC_SRC, Elevation_MTS, MapName, DateCreated, DateEdited)"
+"0","View(CA_Gazetter_SelectedColumns)"

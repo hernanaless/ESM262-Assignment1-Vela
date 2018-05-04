@@ -1,0 +1,5 @@
+"0","CA_Gazetteer_CAOnly <- CA_Gazetter_SelectedColumns %>%"
+"0","  filter(State == ""CA"") %>%"
+"0","  filter(Latitude_DEC != """") %>%"
+"0","  filter(Longitude_DEC != """")"
+"0","View(CA_Gazetteer_CAOnly)"

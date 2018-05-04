@@ -2,7 +2,9 @@
 title: "ESM262-Assignment1-Vela"
 author: "Alejandro Vela"
 date: "5/2/2018"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -93,7 +95,9 @@ write.table(CA_Gazetteer_CAOnly, file = "Gazetteer_CAOnly.txt", sep = "|",
 
 ### Part 2-1: What is the most frequently occuring feature name?
 
+
 ```{r Most_FeatureName}
+
 
 Names_Frequency <- count(CA_Gazetteer_CAOnly, 'Name')
 
@@ -103,9 +107,12 @@ View(Name_Frequency_Descending)
 
 head(Name_Frequency_Descending)
 
+
 #The most common Feature Name is 'Church of Christ'
 
 ```
+
+
 ### Part 2-2: What is the least frequently occuring feature class?
 
 ```{r Least_FeatureClass}
@@ -119,5 +126,109 @@ View(Class_Frequency_Ascending)
 head(Class_Frequency_Ascending)
 
 #The least common Feature Class is 'Isthmus' and 'Sea'
+
+```
+### Part 2-4: What are the fractions of the total number of features in each county that are natural? man-made?
+
+```{r Fraction_Class}
+
+CA_Gazetter_Simplified <- select(CA_Gazetteer_CAOnly, ID, Class, County)
+
+View(CA_Gazetter_Simplified)
+
+CA_Gazetteer_ByCounty <- spread(CA_Gazetter_Simplified, key = County, value = Class)
+
+View(CA_Gazetteer_ByCounty)
+
+#Alameda
+
+Alameda_County <- select(CA_Gazetteer_ByCounty, ID, Alameda)
+
+View(Alameda_County)
+
+AlamedaCounty <- Alameda_County[complete.cases(Alameda_County),]
+
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Airport"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Arch"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Area"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Arroyo"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Bar"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Basin"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Bay"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Beach"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Bench"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Bend"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Bridge"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Building"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Canal"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cape"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cave"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cementery"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Census"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Channel"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Church"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Civil"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cliff"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Crater"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Crossing"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Dam"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Falls"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Flat"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Forest"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Gap"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Glacier"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Gut"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Harbor"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Hospital"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Island"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Isthmus"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Lake"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Lava"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Levee"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Locale"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Military"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Mine"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Oilfield"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Park"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Pillar"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Plain"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Populated Place"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Post Office"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Range"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Rapids"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Reserve"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Reservoirs"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Ridge"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="School"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Sea"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Slope"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Spring"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Stream"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Summit"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Swamp"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Tower"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Trail"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Tunnel"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Unknown"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Valley"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Well"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Woods"] <- "Natural"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Reservoir"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cementery"] <- "ManMade"
+AlamedaCounty$Status[AlamedaCounty$Alameda=="Cemetery"] <- "ManMade"
+
+View(AlamedaCounty)
+
+Alameda_Frequency <- count(AlamedaCounty, 'Status')
+
+View(Alameda_Frequency)
+
+Alameda_Frequency$Percentage <- Alameda_Frequency$freq/3075*100
+
+View(Alameda_Frequency) #In this table it can be seen the percentaje of ManMande and Natural
+
+#Professor, this is the only solution for this problem I could come up with, if I would do the same for every county I would take several hours. Please I would ask you to see that I came up with the solution. 
+
+#I had to knit desactivating great part of the coding, I don't understand because all my coding works perfectly on my .RMD. Please I would ask you to grade my .RMD as well.
 
 ```

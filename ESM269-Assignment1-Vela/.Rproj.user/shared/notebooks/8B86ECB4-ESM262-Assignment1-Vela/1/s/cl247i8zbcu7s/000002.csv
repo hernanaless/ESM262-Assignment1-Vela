@@ -1,0 +1,2 @@
+"0","write.table(CA_Gazetteer_CAOnly, file = ""Gazetteer_CAOnly.txt"", sep = ""|"","
+"0","            row.names = TRUE, col.names = NA)"

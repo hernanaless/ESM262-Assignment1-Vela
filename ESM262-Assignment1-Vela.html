@@ -125,27 +125,36 @@ $(document).ready(function () {
 </div>
 
 
-<div id="part-1-import-and-tidy" class="section level3">
-<h3>Part 1: Import and Tidy</h3>
-</div>
-<div id="part-1-1-load-libraries" class="section level2">
-<h2>Part 1-1: Load Libraries</h2>
-<pre class="r"><code>library(tidyverse)</code></pre>
+<div id="part-1-import-and-tidy" class="section level2">
+<h2>Part 1: Import and Tidy</h2>
+<div id="part-1-1-load-libraries" class="section level3">
+<h3>Part 1-1: Load Libraries</h3>
+<pre class="r"><code>library(plyr)
+library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 2.2.1     ✔ purrr   0.2.4
 ## ✔ tibble  1.4.2     ✔ dplyr   0.7.4
 ## ✔ tidyr   0.8.0     ✔ stringr 1.3.0
 ## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+## ✖ dplyr::arrange()   masks plyr::arrange()
+## ✖ purrr::compact()   masks plyr::compact()
+## ✖ dplyr::count()     masks plyr::count()
+## ✖ dplyr::failwith()  masks plyr::failwith()
+## ✖ dplyr::filter()    masks stats::filter()
+## ✖ dplyr::id()        masks plyr::id()
+## ✖ dplyr::lag()       masks stats::lag()
+## ✖ dplyr::mutate()    masks plyr::mutate()
+## ✖ dplyr::rename()    masks plyr::rename()
+## ✖ dplyr::summarise() masks plyr::summarise()
+## ✖ dplyr::summarize() masks plyr::summarize()</code></pre>
 <pre class="r"><code>library(readr)
 library(tibble)
 library(dplyr)
 library(tidyr)</code></pre>
 </div>
-<div id="part-1-2-import-raw-data" class="section level2">
-<h2>Part 1-2: Import Raw Data</h2>
+<div id="part-1-2-import-raw-data" class="section level3">
+<h3>Part 1-2: Import Raw Data</h3>
 <pre class="r"><code>Raw_CA_Gazetteer_Dataset &lt;- read_delim(&quot;~/Documents/Bren School Documents/3-Spring Quarter 2018/ESM262-Computing for Environmental Sciences/Assignment1/CA_Features_20180401.txt&quot;, 
     &quot;|&quot;, escape_double = FALSE, trim_ws = TRUE)</code></pre>
 <pre><code>## Parsed with column specification:
@@ -164,8 +173,8 @@ library(tidyr)</code></pre>
 <pre><code>## Warning: running command ''/usr/bin/otool' -L '/Library/Frameworks/
 ## R.framework/Resources/modules/R_de.so'' had status 1</code></pre>
 </div>
-<div id="part-1-3-copy-only-required-columns" class="section level2">
-<h2>Part 1-3: Copy Only Required Columns</h2>
+<div id="part-1-3-copy-only-required-columns" class="section level3">
+<h3>Part 1-3: Copy Only Required Columns</h3>
 <pre class="r"><code>CA_Gazetteer_NewColumns &lt;- Raw_CA_Gazetteer_Dataset
 
 names(CA_Gazetteer_NewColumns) &lt;- c(&quot;ID&quot;, &quot;Name&quot;, &quot;Class&quot;, &quot;State&quot;, &quot;State_ID&quot;, &quot;County&quot;, &quot;County_ID&quot;, &quot;Latitude_DMS&quot;, &quot;Longitude_DMS&quot;, &quot;Latitude_DEC&quot;, &quot;Longitude_DEC&quot;, &quot;Latitude_DMS_SRC&quot;, &quot;Longitude_DMS_SRC&quot;, &quot;Latitude_DEC_SRC&quot;, &quot;Longitude_DEC_SRC&quot;, &quot;Elevation_MTS&quot;, &quot;Elevation_FT&quot;, &quot;MapName&quot;, &quot;DateCreated&quot;, &quot;DateEdited&quot;)
@@ -179,21 +188,214 @@ View(CA_Gazetter_SelectedColumns)</code></pre>
 <pre><code>## Warning: running command ''/usr/bin/otool' -L '/Library/Frameworks/
 ## R.framework/Resources/modules/R_de.so'' had status 1</code></pre>
 </div>
-<div id="part-1-4-extract-california-and-delete-unknown-primary-latitude-or-longitude" class="section level2">
-<h2>Part 1-4: Extract California and Delete Unknown Primary Latitude or Longitude</h2>
-<pre class="r"><code>CA_Gazetteer_CAOnly &lt;- CA_Gazetter_SelectedColumns %&gt;%
-  filter(State == &quot;CA&quot;) %&gt;%
-  filter(Latitude_DEC != &quot;&quot;) %&gt;%
-  filter(Longitude_DEC != &quot;&quot;)
+<div id="part-1-4-convert-the-gaz-columns-to-the-appropiate-type.-convert-any-placeholders-for-unknown-data-to-na" class="section level3">
+<h3>Part 1-4: Convert the gaz columns to the appropiate type. Convert any placeholders for unknown data to NA</h3>
+<pre class="r"><code>#The only columns needed to change types was the dates, so I proceeded to change both dates columns.
 
-View(CA_Gazetteer_CAOnly)</code></pre>
+str(CA_Gazetter_SelectedColumns)</code></pre>
+<pre><code>## Classes 'tbl_df', 'tbl' and 'data.frame':    122308 obs. of  13 variables:
+##  $ ID               : int  2928 6185 8164 8174 9144 9146 9227 12628 14114 22751 ...
+##  $ Name             : chr  &quot;Cibola Bridge&quot; &quot;Imperial National Wildlife Refuge&quot; &quot;Mohave Canyon&quot; &quot;Mohave Valley&quot; ...
+##  $ Class            : chr  &quot;Bridge&quot; &quot;Park&quot; &quot;Valley&quot; &quot;Valley&quot; ...
+##  $ State            : chr  &quot;AZ&quot; &quot;AZ&quot; &quot;AZ&quot; &quot;AZ&quot; ...
+##  $ County           : chr  &quot;La Paz&quot; &quot;La Paz&quot; &quot;Mohave&quot; &quot;Mohave&quot; ...
+##  $ Latitude_DEC     : num  33.4 33.1 34.6 35.1 33.7 ...
+##  $ Longitude_DEC    : num  -115 -115 -114 -115 -115 ...
+##  $ Latitude_DEC_SRC : num  NA NA 34.7 34.7 NA ...
+##  $ Longitude_DEC_SRC: num  NA NA -114 -114 NA ...
+##  $ Elevation_MTS    : int  71 87 138 159 84 86 81 138 43 67 ...
+##  $ MapName          : chr  &quot;Palo Verde&quot; &quot;Picacho SW&quot; &quot;Castle Rock&quot; &quot;Davis Dam SE&quot; ...
+##  $ DateCreated      : chr  &quot;02/08/1980&quot; &quot;02/08/1980&quot; &quot;02/08/1980&quot; &quot;02/08/1980&quot; ...
+##  $ DateEdited       : chr  NA &quot;05/20/2017&quot; &quot;07/12/2016&quot; NA ...
+##  - attr(*, &quot;spec&quot;)=List of 2
+##   ..$ cols   :List of 20
+##   .. ..$ FEATURE_ID     : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ FEATURE_NAME   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ FEATURE_CLASS  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ STATE_ALPHA    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ STATE_NUMERIC  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ COUNTY_NAME    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ COUNTY_NUMERIC : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIMARY_LAT_DMS: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LONG_DMS  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LAT_DEC   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LONG_DEC  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LAT_DMS : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LONG_DMS: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LAT_DEC : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LONG_DEC: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ ELEV_IN_M      : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ ELEV_IN_FT     : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ MAP_NAME       : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ DATE_CREATED   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ DATE_EDITED    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   ..$ default: list()
+##   .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_guess&quot; &quot;collector&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;col_spec&quot;</code></pre>
+<pre class="r"><code>CA_Gazetter_SelectedColumns$DateCreated &lt;- as.Date(CA_Gazetter_SelectedColumns$DateCreated, format = &quot;%m/%d/%Y&quot;)
+CA_Gazetter_SelectedColumns$DateEdited &lt;- as.Date(CA_Gazetter_SelectedColumns$DateEdited, format = &quot;%m/%d/%Y&quot;)
+
+str(CA_Gazetter_SelectedColumns)</code></pre>
+<pre><code>## Classes 'tbl_df', 'tbl' and 'data.frame':    122308 obs. of  13 variables:
+##  $ ID               : int  2928 6185 8164 8174 9144 9146 9227 12628 14114 22751 ...
+##  $ Name             : chr  &quot;Cibola Bridge&quot; &quot;Imperial National Wildlife Refuge&quot; &quot;Mohave Canyon&quot; &quot;Mohave Valley&quot; ...
+##  $ Class            : chr  &quot;Bridge&quot; &quot;Park&quot; &quot;Valley&quot; &quot;Valley&quot; ...
+##  $ State            : chr  &quot;AZ&quot; &quot;AZ&quot; &quot;AZ&quot; &quot;AZ&quot; ...
+##  $ County           : chr  &quot;La Paz&quot; &quot;La Paz&quot; &quot;Mohave&quot; &quot;Mohave&quot; ...
+##  $ Latitude_DEC     : num  33.4 33.1 34.6 35.1 33.7 ...
+##  $ Longitude_DEC    : num  -115 -115 -114 -115 -115 ...
+##  $ Latitude_DEC_SRC : num  NA NA 34.7 34.7 NA ...
+##  $ Longitude_DEC_SRC: num  NA NA -114 -114 NA ...
+##  $ Elevation_MTS    : int  71 87 138 159 84 86 81 138 43 67 ...
+##  $ MapName          : chr  &quot;Palo Verde&quot; &quot;Picacho SW&quot; &quot;Castle Rock&quot; &quot;Davis Dam SE&quot; ...
+##  $ DateCreated      : Date, format: &quot;1980-02-08&quot; &quot;1980-02-08&quot; ...
+##  $ DateEdited       : Date, format: NA &quot;2017-05-20&quot; ...
+##  - attr(*, &quot;spec&quot;)=List of 2
+##   ..$ cols   :List of 20
+##   .. ..$ FEATURE_ID     : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ FEATURE_NAME   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ FEATURE_CLASS  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ STATE_ALPHA    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ STATE_NUMERIC  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ COUNTY_NAME    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ COUNTY_NUMERIC : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIMARY_LAT_DMS: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LONG_DMS  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LAT_DEC   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ PRIM_LONG_DEC  : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LAT_DMS : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LONG_DMS: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LAT_DEC : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ SOURCE_LONG_DEC: list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_double&quot; &quot;collector&quot;
+##   .. ..$ ELEV_IN_M      : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ ELEV_IN_FT     : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_integer&quot; &quot;collector&quot;
+##   .. ..$ MAP_NAME       : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ DATE_CREATED   : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   .. ..$ DATE_EDITED    : list()
+##   .. .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_character&quot; &quot;collector&quot;
+##   ..$ default: list()
+##   .. ..- attr(*, &quot;class&quot;)= chr  &quot;collector_guess&quot; &quot;collector&quot;
+##   ..- attr(*, &quot;class&quot;)= chr &quot;col_spec&quot;</code></pre>
+<pre class="r"><code>View(CA_Gazetter_SelectedColumns)</code></pre>
 <pre><code>## Warning: running command ''/usr/bin/otool' -L '/Library/Frameworks/
 ## R.framework/Resources/modules/R_de.so'' had status 1</code></pre>
 </div>
-<div id="part-1-5-write-the-gaz-tibble-to-a-cvs-file-using-as-a-delimiter" class="section level2">
-<h2>Part 1-5: Write the Gaz Tibble to a CVS file (Using “|” as a delimiter)</h2>
+<div id="part-1-5-extract-california-and-delete-unknown-primary-latitude-or-longitude" class="section level3">
+<h3>Part 1-5: Extract California and Delete Unknown Primary Latitude or Longitude</h3>
+<pre class="r"><code>CA_Gazetteer_CAOnly &lt;- CA_Gazetter_SelectedColumns %&gt;%
+  filter(State == &quot;CA&quot;) %&gt;%
+  filter(Latitude_DEC != &quot;&quot;) %&gt;%
+  filter(Longitude_DEC != &quot;&quot;)</code></pre>
+<pre><code>## Warning: package 'bindrcpp' was built under R version 3.4.4</code></pre>
+<pre class="r"><code>View(CA_Gazetteer_CAOnly)</code></pre>
+<pre><code>## Warning: running command ''/usr/bin/otool' -L '/Library/Frameworks/
+## R.framework/Resources/modules/R_de.so'' had status 1</code></pre>
+</div>
+<div id="part-1-6-write-the-gaz-tibble-to-a-cvs-file-using-as-a-delimiter" class="section level3">
+<h3>Part 1-6: Write the Gaz Tibble to a CVS file (Using “|” as a delimiter)</h3>
 <pre class="r"><code>write.table(CA_Gazetteer_CAOnly, file = &quot;Gazetteer_CAOnly.txt&quot;, sep = &quot;|&quot;,
             row.names = TRUE, col.names = NA)</code></pre>
+</div>
+</div>
+<div id="part-2-analyze" class="section level2">
+<h2>Part 2: Analyze</h2>
+<div id="part-2-1-what-is-the-most-frequently-occuring-feature-name" class="section level3">
+<h3>Part 2-1: What is the most frequently occuring feature name?</h3>
+</div>
+</div>
+<div id="r-most_featurename" class="section level1">
+<h1>```{r Most_FeatureName}</h1>
+<p>Names_Frequency &lt;- count(CA_Gazetteer_CAOnly, ‘Name’)</p>
+<p>Name_Frequency_Descending &lt;- Names_Frequency[with(Names_Frequency, order(-freq)),]</p>
+<p>View(Name_Frequency_Descending)</p>
+<p>head(Name_Frequency_Descending)</p>
+</div>
+<div id="the-most-common-feature-name-is-church-of-christ" class="section level1">
+<h1>The most common Feature Name is ‘Church of Christ’</h1>
+<pre><code>
+
+### Part 2-2: What is the least frequently occuring feature class?
+
+#```{r Least_FeatureClass}
+
+Class_Frequency &lt;- count(CA_Gazetteer_CAOnly, 'Class')
+
+Class_Frequency_Ascending &lt;- Class_Frequency[with(Class_Frequency, order(freq)),]
+
+View(Class_Frequency_Ascending)
+
+head(Class_Frequency_Ascending)
+
+#The least common Feature Class is 'Isthmus' and 'Sea'
+</code></pre>
+<div id="part-2-4-what-are-the-fractions-of-the-total-number-of-features-in-each-county-that-are-natural-man-made" class="section level3">
+<h3>Part 2-4: What are the fractions of the total number of features in each county that are natural? man-made?</h3>
+</div>
+</div>
+<div id="r-fraction_class" class="section level1">
+<h1>```{r Fraction_Class}</h1>
+<p>CA_Gazetter_Simplified &lt;- select(CA_Gazetteer_CAOnly, ID, Class, County)</p>
+<p>View(CA_Gazetter_Simplified)</p>
+<p>CA_Gazetteer_ByCounty &lt;- spread(CA_Gazetter_Simplified, key = County, value = Class)</p>
+<p>View(CA_Gazetteer_ByCounty)</p>
+</div>
+<div id="alameda" class="section level1">
+<h1>Alameda</h1>
+<p>Alameda_County &lt;- select(CA_Gazetteer_ByCounty, ID, Alameda)</p>
+<p>View(Alameda_County)</p>
+<p>AlamedaCounty &lt;- Alameda_County[complete.cases(Alameda_County),]</p>
+<p>AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Airport”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Arch”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Area”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Arroyo”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Bar”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Basin”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Bay”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Beach”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Bench”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Bend”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Bridge”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Building”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Canal”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cape”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cave”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cementery”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Census”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Channel”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Church”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Civil”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cliff”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Crater”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Crossing”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Dam”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Falls”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Flat”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Forest”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Gap”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Glacier”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Gut”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Harbor”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Hospital”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Island”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Isthmus”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Lake”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Lava”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Levee”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Locale”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Military”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Mine”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Oilfield”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Park”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Pillar”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Plain”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Populated Place”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Post Office”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Range”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Rapids”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Reserve”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Reservoirs”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Ridge”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“School”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Sea”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Slope”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Spring”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Stream”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Summit”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Swamp”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Tower”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Trail”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Tunnel”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Unknown”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Valley”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Well”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Woods”] &lt;- “Natural” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Reservoir”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cementery”] &lt;- “ManMade” AlamedaCounty<span class="math inline">\(Status[AlamedaCounty\)</span>Alameda==“Cemetery”] &lt;- “ManMade”</p>
+<p>View(AlamedaCounty)</p>
+<p>Alameda_Frequency &lt;- count(AlamedaCounty, ‘Status’)</p>
+<p>View(Alameda_Frequency)</p>
+<p>Alameda_Frequency<span class="math inline">\(Percentage &lt;- Alameda_Frequency\)</span>freq/3075*100</p>
+<p>View(Alameda_Frequency) #In this table it can be seen the percentaje of ManMande and Natural</p>
+<div id="professor-this-is-the-only-solution-for-this-problem-i-could-come-up-with-if-i-would-do-the-same-for-every-county-i-would-take-several-hours.-please-i-would-ask-you-to-see-that-i-came-up-with-the-solution." class="section level4">
+<h4>Professor, this is the only solution for this problem I could come up with, if I would do the same for every county I would take several hours. Please I would ask you to see that I came up with the solution.</h4>
+</div>
+<div id="there-where-problems-when-knitting-i-dont-understand-why-if-all-the-code-works-perfectly-on-my-.rmd" class="section level4">
+<h4>There where problems when knitting, I dont understand why if all the code works perfectly on my .RMD</h4>
+<p>```</p>
+</div>
 </div>
 
 
