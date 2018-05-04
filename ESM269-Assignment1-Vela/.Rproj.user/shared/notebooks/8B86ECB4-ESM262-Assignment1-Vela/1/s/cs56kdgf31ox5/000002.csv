@@ -1,0 +1,17 @@
+"0","Raw_CA_Gazetteer_Dataset <- read_delim(""~/Documents/Bren School Documents/3-Spring Quarter 2018/ESM262-Computing for Environmental Sciences/Assignment1/CA_Features_20180401.txt"", 
+    ""|"", escape_double = FALSE, trim_ws = TRUE)
+"
+"2","Parsed with column specification:
+cols(
+  .default = col_character(),
+  FEATURE_ID = col_integer(),
+  PRIM_LAT_DEC = col_double(),
+  PRIM_LONG_DEC = col_double(),
+  SOURCE_LAT_DEC = col_double(),
+  SOURCE_LONG_DEC = col_double(),
+  ELEV_IN_M = col_integer(),
+  ELEV_IN_FT = col_integer()
+)
+"
+"2","See spec(...) for full column specifications.
+"

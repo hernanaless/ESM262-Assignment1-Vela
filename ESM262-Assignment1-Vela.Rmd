@@ -1,0 +1,123 @@
+---
+title: "ESM262-Assignment1-Vela"
+author: "Alejandro Vela"
+date: "5/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Part 1: Import and Tidy
+
+### Part 1-1: Load Libraries
+
+
+```{r load_libraries}
+
+library(plyr)
+library(tidyverse)
+library(readr)
+library(tibble)
+library(dplyr)
+library(tidyr)
+
+
+```
+### Part 1-2: Import Raw Data
+
+```{r Import_Data}
+
+
+Raw_CA_Gazetteer_Dataset <- read_delim("~/Documents/Bren School Documents/3-Spring Quarter 2018/ESM262-Computing for Environmental Sciences/Assignment1/CA_Features_20180401.txt", 
+    "|", escape_double = FALSE, trim_ws = TRUE)
+
+View(Raw_CA_Gazetteer_Dataset)
+
+```
+
+### Part 1-3: Copy Only Required Columns
+
+```{r Select_Columns}
+
+CA_Gazetteer_NewColumns <- Raw_CA_Gazetteer_Dataset
+
+names(CA_Gazetteer_NewColumns) <- c("ID", "Name", "Class", "State", "State_ID", "County", "County_ID", "Latitude_DMS", "Longitude_DMS", "Latitude_DEC", "Longitude_DEC", "Latitude_DMS_SRC", "Longitude_DMS_SRC", "Latitude_DEC_SRC", "Longitude_DEC_SRC", "Elevation_MTS", "Elevation_FT", "MapName", "DateCreated", "DateEdited")
+
+View(CA_Gazetteer_NewColumns)
+
+CA_Gazetter_SelectedColumns <- select(CA_Gazetteer_NewColumns, ID, Name, Class, State, County, Latitude_DEC, Longitude_DEC, Latitude_DEC_SRC, Longitude_DEC_SRC, Elevation_MTS, MapName, DateCreated, DateEdited)
+
+View(CA_Gazetter_SelectedColumns)
+```
+
+### Part 1-4: Convert the gaz columns to the appropiate type. Convert any placeholders for unknown data to NA
+
+```{r col_types}
+
+#The only columns needed to change types was the dates, so I proceeded to change both dates columns.
+
+str(CA_Gazetter_SelectedColumns)
+
+CA_Gazetter_SelectedColumns$DateCreated <- as.Date(CA_Gazetter_SelectedColumns$DateCreated, format = "%m/%d/%Y")
+CA_Gazetter_SelectedColumns$DateEdited <- as.Date(CA_Gazetter_SelectedColumns$DateEdited, format = "%m/%d/%Y")
+
+str(CA_Gazetter_SelectedColumns)
+View(CA_Gazetter_SelectedColumns)
+
+```
+
+### Part 1-5: Extract California and Delete Unknown Primary Latitude or Longitude
+
+```{r Extract_CA_DeleteUnknowns}
+
+CA_Gazetteer_CAOnly <- CA_Gazetter_SelectedColumns %>%
+  filter(State == "CA") %>%
+  filter(Latitude_DEC != "") %>%
+  filter(Longitude_DEC != "")
+
+View(CA_Gazetteer_CAOnly)
+
+```
+
+### Part 1-6: Write the Gaz Tibble to a CVS file (Using "|" as a delimiter)
+
+```{r Export_TXTFile}
+
+write.table(CA_Gazetteer_CAOnly, file = "Gazetteer_CAOnly.txt", sep = "|",
+            row.names = TRUE, col.names = NA)
+
+```
+
+## Part 2: Analyze
+
+### Part 2-1: What is the most frequently occuring feature name?
+
+```{r Most_FeatureName}
+
+Names_Frequency <- count(CA_Gazetteer_CAOnly, 'Name')
+
+Name_Frequency_Descending <- Names_Frequency[with(Names_Frequency, order(-freq)),]
+
+View(Name_Frequency_Descending)
+
+head(Name_Frequency_Descending)
+
+#The most common Feature Name is 'Church of Christ'
+
+```
+### Part 2-2: What is the least frequently occuring feature class?
+
+```{r Least_FeatureClass}
+
+Class_Frequency <- count(CA_Gazetteer_CAOnly, 'Class')
+
+Class_Frequency_Ascending <- Class_Frequency[with(Class_Frequency, order(freq)),]
+
+View(Class_Frequency_Ascending)
+
+head(Class_Frequency_Ascending)
+
+#The least common Feature Class is 'Isthmus' and 'Sea'
+
+```
